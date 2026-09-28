@@ -6,20 +6,21 @@ one protocol-aware modem. The point is that coherence is a *technique*, not expe
 > **Privacy note:** this document describes hardware and its capabilities only. No network addresses,
 > hostnames, keys or private infrastructure details are published here.
 
-## 1. Current bench
+## 1. Current bench *(confirmed 2026-09-28)*
 
-### 1.1 RTL-SDR dongles (×2)
+### 1.1 RTL-SDR dongle (×1)
 
 - Chipset: RTL2838 (RTL2832u demodulator + R820T-class tuner).
-- Native clock: **28.8 MHz**.
-- Coverage: usable through the 902–928 MHz US ISM band.
+- Coverage: **≈24–1766 MHz**. This reaches the 902–928 MHz LoRa band, the 433/868 MHz device bands, and
+  the 2 m/70 cm amateur bands — but **not 2.4 GHz**, so it cannot see Wi-Fi or Bluetooth LE.
 - Bandwidth: ≈2.4 MHz instantaneous; **8-bit** samples.
+- Native clock: **28.8 MHz**.
 - **Receive-only.**
-- Bus current: ≈185 mA each when tuned (R820T), so use a self-powered USB hub.
-- One dongle is used directly over USB; the other is exposed over the network via `rtl_tcp`, so it can
-  physically sit somewhere else (a different room, a different building, a remote site).
+- Bus current: ≈185 mA tuned (R820T) — use a self-powered USB hub.
+- **One receiver cannot form an antenna array.** See [`RF_SURVEY.md`](RF_SURVEY.md) §5 for what an
+  "omni antenna array" can and cannot do with a single channel.
 
-### 1.2 Web-888 network SDR
+### 1.2 Web-888 network SDR (×1)
 
 - Origin: RX-888 lineage; single-board, plug-and-play, web interface (Alpine Linux, read-only root).
 - HF: ≈0–61 MHz. VHF: second Nyquist-zone channel with a 118–150 MHz band-pass filter and +20 dB LNA.
@@ -30,78 +31,96 @@ one protocol-aware modem. The point is that coherence is a *technique*, not expe
 - **GNSS module** (BDS/GPS/GLONASS/GALILEO) with **PPS**.
 - **Si5351** clock synthesiser governs the ADC clock and can drive the **clock-out SMA**; a reference
   **clock-in** option also exists. Clock-out is disabled by default because it degrades phase noise.
-- **Cannot receive the 902–928 MHz LoRa band.** It is the reference and the HF/VHF monitor, not a LoRa
-  sensor.
+- **Cannot receive the 902–928 MHz LoRa band, nor 2.4 GHz.** It is the reference, the HF/VHF monitor, and
+  (ideally) a fixed installation — not a LoRa or Wi-Fi sensor.
 
-### 1.3 Spare MeshCore modem
+### 1.3 Heltec V4 — MeshCore modem (×1)
 
-- The only transmitter and the only protocol-aware radio.
-- Roles: ground-truth decode, calibration beacon (compliant, low duty cycle), later the radio front end
-  of a spatially-aware relay.
-- Drivable from the Linux host (serial/BLE/USB depending on the specific device).
+- MCU: ESP32-S3 (dual-core, Wi-Fi + BLE 5) with a Semtech **SX1262** sub-GHz LoRa transceiver.
+- Roles:
+  - **MeshCore modem** — the only transmitter and the only protocol-aware radio; ground-truth decode,
+    calibration beacon, later the radio front end of a spatially-aware relay.
+  - **2.4 GHz Wi-Fi + BLE radio** — the ESP32-S3 can scan 2.4 GHz Wi-Fi and BLE.
+- **Constraint:** while the unit is flashed with MeshCore firmware, its Wi-Fi/BLE is not a general-purpose
+  scanner. To use the ESP32 for Wi-Fi/BLE surveying, either run custom firmware (losing the MeshCore role
+  on that unit) or use a **separate** ESP32 board. Use the separate board.
 
-### 1.4 Linux host(s)
+### 1.4 Supporting boards (2.4 GHz survey sensors)
 
-- Run capture, DSP, fusion, and the live view; one host may also host the modem and one dongle, with the
-  other dongle and (optionally) further receivers reachable over the network.
+- **Waveshare ESP32-C6-LCD-1.47** — 2.4 GHz Wi-Fi 6, BLE 5, 802.15.4 (Thread/Zigbee) plus a small display.
+  Ideal dedicated Wi-Fi/BLE/802.15.4 survey sensor and status display.
+- **ESP32-S3 board** (exact model TBC) — 2.4 GHz Wi-Fi + BLE; alternative survey sensor.
+- Both are **2.4 GHz only** — neither reaches 5 GHz Wi-Fi.
 
-## 2. Clock distribution (planned)
+### 1.5 Positioning
 
-The reference plane must deliver one stable clock to all dongles.
+- The Web-888 GNSS is at the **fixed** installation; it is the time/frequency reference and a survey
+  anchor.
+- A **roving** survey needs its own position source: a USB GNSS puck, a phone, or a GNSS module on the
+  survey MCU.
+
+### 1.6 Compute
+
+- Linux host(s) run capture, DSP, fusion and the live view; one host may host the RTL-SDR and the modem,
+  with the Web-888 and any additional sensors reachable over the network.
+
+## 2. What the confirmed suite can and cannot sense
+
+| Band / service | Sensor | Status |
+|---|---|---|
+| HF 0–61 MHz | Web-888 | ✅ |
+| VHF 118–150 MHz | Web-888 | ✅ |
+| Sub-GHz ≈24–1766 MHz (LoRa 902–928, 433, 868, 2 m, 70 cm) | RTL-SDR | ✅ |
+| LoRa mesh (MeshCore/Meshtastic/Reticulum) decode | Heltec modem (+ SDR) | ✅ |
+| Wi-Fi 2.4 GHz | ESP32-C6 / ESP32-S3 | ✅ (needs a spare board) |
+| Bluetooth LE | ESP32-C6 / ESP32-S3 | ✅ (needs a spare board) |
+| **Wi-Fi 5 GHz** | — | ❌ gap |
+| **Sub-GHz spectrum heat-mapping** | RTL-SDR (`rtl_power`) | ✅ |
+| **Directions of arrival** | needs ≥2 coherent receivers | ❌ with one RTL-SDR |
+
+## 3. Clock distribution (planned)
 
 ```
 Web-888 (GPS/PPS-disciplined Si5351)
         │  clock-out SMA
         ▼
-  clock buffer / divider  ──▶ 28.8 MHz ──▶ RTL-SDR #0 clock-in
-                          ──▶ 28.8 MHz ──▶ RTL-SDR #1 clock-in
+  clock buffer / divider  ──▶ 28.8 MHz ──▶ RTL-SDR clock-in
 ```
 
-Notes and unknowns:
+- The dongle wants **28.8 MHz**; whether the Web-888 clock-out can supply it independently of the
+  122.88 MHz ADC clock must be confirmed against firmware.
+- Prior art: a single dongle's clock output was only good for ~3 receivers before the fourth broke
+  synchronisation — use a proper buffer if the array ever grows.
 
-- The dongles want **28.8 MHz**. Since the Si5351 is programmable, a second output *may* be settable to
-  28.8 MHz; this must be confirmed against firmware before committing.
-- Prior art used a dedicated low-jitter clock distribution board; a single dongle's clock output was only
-  good for about three receivers before the fourth broke synchronisation. Use a proper buffer.
-- A GPS-disciplined oscillator with low phase noise may be added later if direction-finding demands it.
+## 4. Phase calibration (planned, Phase 5)
 
-## 3. Phase calibration (planned, Phase 4)
-
-Following the Laakso method: a **switchable injected reference signal** is fed into every channel. With
-the reference on, the relative channel phases are measured and corrected; with it off, the array observes
-the real environment. Implementation options range from a small noise/reference generator with a
-switchable splitter to a purpose-built injection board.
-
-The **MeshCore modem doubling as a cooperative calibration beacon** provides an independent check: a
-known signal from a known position, transmitted on command.
-
-## 4. Antennas and siting
-
-- Short-baseline direction finding needs elements spaced on the order of a fraction of a wavelength at
-  915 MHz (≈33 cm per wavelength); a compact array or a small ground plane works.
-- Long-baseline TDOA needs separated sites with GPS-disciplined timing and a clear sky view for the
-  reference receiver.
-- Diversity reception benefits from *spatially decorrelated* antennas, even coarsely separated.
+Following the Laakso method: a **switchable injected reference signal** fed into every coherent channel so
+relative phases can be measured and corrected. With only one receiver today, this is dormant until the
+array grows. The Heltec modem doubling as a **cooperative calibration beacon** gives a known signal from a
+known position for validation.
 
 ## 5. Bill-of-materials sketch
 
 | Item | Qty | Purpose |
 |---|---|---|
-| RTL-SDR dongle (RTL2838) | 2 | LoRa-band sensing |
-| Web-888 network SDR | 1 | GPS reference + HF/VHF monitoring |
+| RTL-SDR dongle (RTL2838) | 1 | Sub-GHz sensing, spectrum sweeps, LoRa band |
+| Web-888 network SDR | 1 | GPS reference + HF/VHF monitoring (fixed) |
 | GNSS antenna | 1 | Reference timing |
-| MeshCore modem | 1 | Truth, TX, calibration beacon |
-| Self-powered USB hub | 1 | Power the dongles |
-| Linux host(s) | 1–2 | Capture, DSP, fusion |
-| Clock buffer / divider (planned) | 1 | Distribute 28.8 MHz |
-| Reference injection network (planned) | 1 | Phase calibration |
+| Heltec V4 (MeshCore) | 1 | Truth, TX, calibration beacon |
+| ESP32-C6 / ESP32-S3 board | 1+ | 2.4 GHz Wi-Fi / BLE / 802.15.4 survey |
+| Mobile GNSS (puck/phone/module) | 1 | Roving survey position |
+| Self-powered USB hub | 1 | Power the dongle |
+| Portable power + enclosure | 1 | Roving survey rig |
+| Linux host | 1 | Capture, DSP, fusion |
+| Clock buffer (planned) | 1 | Distribute 28.8 MHz (if the array grows) |
+| Reference injection network (planned) | 1 | Phase calibration (if the array grows) |
 
-Prices are deliberately omitted; the project prefers to describe capability and let builders source
-locally.
+Prices are deliberately omitted; the project describes capability and lets builders source locally.
 
 ## 6. Verified versus assumed
 
-- **Verified** (from the manufacturer's design notes and the existing bench): GPS/PPS presence, Si5351
-  governance, clock-out/clock-in availability, Web-888 band limits, dongle composition and reachability.
-- **Assumed, to confirm:** that the Web-888 clock-out can be set to 28.8 MHz independently of the ADC
-  clock, and the exact dongle clock-injection point for the specific boards in use.
+- **Verified:** RTL-SDR band limit (no 2.4 GHz); Web-888 band limits, GPS/PPS, Si5351 governance and
+  clock-out/clock-in availability; Heltec V4 = ESP32-S3 + SX1262.
+- **Assumed, to confirm:** whether the Web-888 clock-out can be set to 28.8 MHz independently of the ADC
+  clock; whether a spare ESP32 board is available for Wi-Fi/BLE survey work; the exact ESP32-S3 board
+  model.

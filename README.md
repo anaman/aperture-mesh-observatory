@@ -1,7 +1,7 @@
 # Aperture Mesh Observatory
 
 **A GPS-disciplined, multi-receiver coherent sensing platform for LoRa mesh networks
-(MeshCore · Meshtastic · Reticulum).**
+(MeshCore · Meshtastic · Reticulum) — and a georeferenced community RF survey instrument.**
 
 Status: **Phase 0 — Proposal & corpus** · Project opened 2026-09-28
 Maintainer: Charles Anaman ([@anaman](https://github.com/anaman))
@@ -21,6 +21,10 @@ It exists to answer questions that mesh operators currently cannot:
 - **Who is colliding, and who is jamming?** Which channel is congested, and when?
 - **Which direction is that repeater?** (direction of arrival)
 - **When did that packet arrive**, to sub-sample precision across *separate* receivers? (long-baseline TDOA)
+
+And, as a broader layer, a **georeferenced community RF survey**: a fixed and/or roving data-collection
+rig that maps spectrum occupancy, the LoRa mesh, 2.4 GHz Wi-Fi and Bluetooth LE over the neighbourhood
+(see [`docs/RF_SURVEY.md`](docs/RF_SURVEY.md)).
 
 The long-term prize is a Linux-based relay that understands the *spatial* structure of the channel it
 operates in — not just the bytes.
@@ -43,18 +47,20 @@ The critical distinction this project is built around:
 
 > **GPS discipline solves time and frequency. Reference injection solves carrier phase. They are not the same thing, and the project needs both.**
 
-## Hardware (current bench)
+## Hardware (confirmed 2026-09-28)
 
 | Element | Role | Constraint |
 |---|---|---|
-| 2× RTL-SDR (RTL2838) dongles | LoRa-band sensing (902–928 MHz) | **Receive-only**, ~2.4 MHz each, 8-bit |
-| Web-888 network SDR | HF/VHF monitoring **and** GPS time/frequency reference | **Cannot see LoRa** (≈0–61 MHz HF + 118–150 MHz VHF) |
-| Spare MeshCore modem | Ground-truth decode, transmit, **cooperative calibration beacon** | The only transmitter |
+| 1× RTL-SDR (RTL2838) dongle | Sub-GHz sensing (≈24–1766 MHz): LoRa band, spectrum sweeps | **Receive-only**, ~2.4 MHz, 8-bit; **cannot reach 2.4 GHz**; one receiver cannot form an array |
+| 1× Web-888 network SDR | HF/VHF monitoring **and** GPS time/frequency reference | **Cannot see LoRa or 2.4 GHz** (≈0–61 MHz HF + 118–150 MHz VHF) |
+| 1× Heltec V4 (ESP32-S3 + SX1262) | MeshCore modem: decode, transmit, **cooperative calibration beacon** | The only transmitter; its ESP32 gives 2.4 GHz Wi-Fi/BLE **only if not running MeshCore firmware** |
+| ESP32-C6 / ESP32-S3 board (spare, optional) | 2.4 GHz Wi-Fi / BLE / 802.15.4 survey sensor | 2.4 GHz only; no 5 GHz |
 | Linux host(s) | Capture, DSP, orchestration, relay logic | — |
-| GPS/GNSS antenna (Web-888) | Absolute time + disciplined clock | Sky view required |
+| GNSS (fixed base + mobile) | Absolute time + disciplined clock; roving position | Sky view required |
 
-The intended future upgrade is a common-clock feed to the dongles (28.8 MHz) sourced from the
-Web-888, plus a small phase-calibration injection network. See [`docs/HARDWARE.md`](docs/HARDWARE.md).
+The intended future upgrade is a common-clock feed to the receiver (28.8 MHz) sourced from the Web-888,
+plus a small phase-calibration injection network — for when the receiver count grows. See
+[`docs/HARDWARE.md`](docs/HARDWARE.md) and [`docs/RF_SURVEY.md`](docs/RF_SURVEY.md).
 
 ## Architecture — three planes
 
@@ -81,13 +87,14 @@ Full detail in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 | Phase | Goal | Needs |
 |---|---|---|
-| **0** | Proposal, corpus, repo scaffolding | *this commit* |
-| **1** | Mesh observatory: dual-SDR + modem, coverage mapping, interference/duty-cycle analytics, dataset capture | no hardware mods |
-| **2** | LoRa PHY demodulation + multi-protocol decode (Meshtastic / MeshCore / Reticulum) | gr-lora_sdr |
-| **3** | Time/frequency coherence → absolute-time long-baseline TDOA | Web-888 clock distribution |
-| **4** | Carrier-phase coherence → short-baseline bearing; cooperative calibration beacon | reference-injection mod |
-| **5** | Applications: DOA-aided relaying, interference nulling, multi-packet reception, sparse-array studies | — |
-| **6** | Distributed / transmit-side coherent arrays | *out of current scope; research* |
+| **0** | Proposal, corpus, repo scaffolding | *done 2026-09-28* |
+| **1** | LoRa observatory core: RTL-SDR + Heltec modem, ground truth, duty-cycle analytics | no hardware mods |
+| **2** | **Community RF survey**: georeferenced sub-GHz + Wi-Fi/BLE mapping, fixed and roving | spare ESP32 board |
+| **3** | LoRa PHY demodulation + multi-protocol decode (Meshtastic / MeshCore / Reticulum) | gr-lora_sdr |
+| **4** | Time/frequency coherence → absolute-time long-baseline TDOA | Web-888 clock distribution + a second receiver |
+| **5** | Carrier-phase coherence → short-baseline bearing; cooperative calibration beacon | reference-injection mod + a second receiver |
+| **6** | Applications: DOA-aided relaying, interference nulling, multi-packet reception, sparse-array studies | — |
+| **7** | Distributed / transmit-side coherent arrays | *out of current scope; research* |
 
 Full detail in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
@@ -111,8 +118,9 @@ start at [`docs/REPLICATION.md`](docs/REPLICATION.md).
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system architecture and data flow
 - [`docs/HARDWARE.md`](docs/HARDWARE.md) — inventory, clock distribution, calibration hardware
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — phases, milestones, exit criteria
+- [`docs/RF_SURVEY.md`](docs/RF_SURVEY.md) — the georeferenced community RF survey subsystem
 - [`docs/REPLICATION.md`](docs/REPLICATION.md) — how to rebuild from scratch
-- [`docs/REGULATORY.md`](docs/REGULATORY.md) — spectrum, power, duty-cycle notes
+- [`docs/REGULATORY.md`](docs/REGULATORY.md) — spectrum, power, duty-cycle and privacy notes
 - [`docs/GLOSSARY.md`](docs/GLOSSARY.md) — terms used throughout
 - [`docs/REFERENCES.md`](docs/REFERENCES.md) — annotated, dated source list
 - [`DEVLOG.md`](DEVLOG.md) — chronological development log

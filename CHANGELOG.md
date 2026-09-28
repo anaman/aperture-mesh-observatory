@@ -18,3 +18,13 @@ deliverables per phase.
 - `docs/REFERENCES.md` — annotated, dated source list.
 - `DEVLOG.md` — development log.
 - `LICENSE` (GPL-3.0), `.gitignore`, `src/README.md`.
+
+### Changed / Added — 2026-09-28 (bench confirmed, RF survey)
+- Confirmed bench: 1× RTL-SDR, 1× Web-888, 1× Heltec V4 (corrects the earlier two-dongle assumption).
+- `docs/RF_SURVEY.md` — georeferenced community RF survey subsystem (sub-GHz + Wi-Fi/BLE mapping).
+- `docs/ROADMAP.md` — inserted Phase 2 (RF survey); phased plan renumbered to 0–7.
+- `docs/HARDWARE.md` — rewritten for the confirmed bench; added capability matrix and honest gaps
+  (no 2.4 GHz on the RTL-SDR, no 5 GHz, one receiver is not an array, Wi-Fi/BLE needs a spare ESP32).
+- `README.md` — confirmed hardware table, survey capability, renumbered roadmap, doc index.
+- `docs/PROPOSAL.md` — objectives, approach, phased plan and open questions updated.
+- `DEVLOG.md` — decision entry for the confirmed bench and the added survey.

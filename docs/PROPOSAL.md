@@ -97,21 +97,25 @@ Therefore the project is built on two distinct capability regimes that must not 
 1. **Build a mesh observatory** that passively monitors LoRa mesh traffic and produces a live,
    ground-truthed picture of coverage, location (proximity and, later, bearing), collisions and
    interference.
-2. **Achieve time/frequency coherence** across receivers using the GPS-disciplined reference, and use it
+2. **Build a community RF survey instrument** — a fixed and/or roving data-collection rig that maps
+   sub-GHz spectrum occupancy, the LoRa mesh, 2.4 GHz Wi-Fi and Bluetooth LE over a neighbourhood,
+   georeferenced by GNSS.
+3. **Achieve time/frequency coherence** across receivers using the GPS-disciplined reference, and use it
    for long-baseline TDOA.
-3. **Achieve carrier-phase coherence** using a reference-injection calibration network, and use it for
+4. **Achieve carrier-phase coherence** using a reference-injection calibration network, and use it for
    short-baseline direction of arrival.
-4. **Use the spare MeshCore modem as a cooperative calibration beacon**, transmitting compliant known
+5. **Use the Heltec V4 MeshCore modem as a cooperative calibration beacon**, transmitting compliant known
    signals from known positions to calibrate the array.
-5. **Document everything** — bench, software, experiments, failures — so the work is fully replicable.
-6. **Apply the results to relaying**: feed spatial awareness back into Linux-based relay behaviour.
+6. **Document everything** — bench, software, experiments, failures — so the work is fully replicable.
+7. **Apply the results to relaying**: feed spatial awareness back into Linux-based relay behaviour.
 
 ## 5. Approach — three planes
 
 - **Reference plane.** GPS → PPS → Web-888 Si5351 → disciplined clock-out → (future) 28.8 MHz feed to
   the dongles. Supplies absolute time and stable frequency to the whole system.
-- **Sensing plane.** Two RTL-SDR dongles (USB and network/`rtl_tcp`) for the 902–928 MHz LoRa band, plus
-  the Web-888 for HF/VHF. Capture, then process to RSSI, arrival time, and (later) bearing.
+- **Sensing plane.** The RTL-SDR for sub-GHz (LoRa band and spectrum sweeps), the Web-888 for HF/VHF, and
+  a spare ESP32 board for 2.4 GHz Wi-Fi/BLE survey work. Capture, then process to RSSI, arrival time and
+  (later) bearing.
 - **Act / truth plane.** The spare MeshCore modem decodes real packets (ground truth), transmits the
   calibration beacon, and eventually acts as the radio interface of a spatially-aware relay.
 
@@ -122,29 +126,28 @@ Detailed architecture: [`ARCHITECTURE.md`](ARCHITECTURE.md). Hardware: [`HARDWAR
 **Phase 0 — Proposal & corpus (now).** Publish this proposal, the annotated source list, and the
 repository scaffolding.
 
-**Phase 1 — Mesh observatory (no hardware modification required).**
-- Dual-SDR capture plus modem ground truth; unified live view.
-- Two-site RSSI proximity/localisation keyed to decoded node identities.
-- Coverage mapping and hole-finding.
-- Interference, collision and duty-cycle analytics (passive only).
-- Synchronised dataset capture (IQ + decode log) for later research.
+**Phase 1 — LoRa observatory core.** RTL-SDR capture plus Heltec modem ground truth; unified live view;
+channel plan; interference, collision and duty-cycle analytics (passive only); synchronised dataset
+capture.
 
-**Phase 2 — PHY demodulation & multi-protocol decode.** Integrate GNU Radio `gr-lora_sdr`; decode
-Meshtastic, MeshCore and Reticulum framing. Multi-channel capture lets one physical modem support
-several monitored protocols.
+**Phase 2 — Community RF survey.** Fixed and/or roving georeferenced mapping of sub-GHz spectrum, the LoRa
+mesh, 2.4 GHz Wi-Fi and Bluetooth LE; heat-maps, occupancy history, mesh overlay. See
+[`RF_SURVEY.md`](RF_SURVEY.md).
 
-**Phase 3 — Time/frequency coherence.** Distribute the Web-888 disciplined clock to the dongles;
-establish absolute-time timestamping; implement long-baseline TDOA between separated receivers.
+**Phase 3 — PHY demodulation & multi-protocol decode.** Integrate GNU Radio `gr-lora_sdr`; decode
+Meshtastic, MeshCore and Reticulum framing.
 
-**Phase 4 — Carrier-phase coherence.** Build the reference-injection phase-calibration network; run the
-Laakso-style phase-alignment procedure; demonstrate short-baseline bearing. Use the MeshCore modem as a
-known-position calibration beacon.
+**Phase 4 — Time/frequency coherence.** Distribute the Web-888 disciplined clock; establish absolute-time
+timestamping; implement long-baseline TDOA between separated receivers (needs a second receiver).
 
-**Phase 5 — Applications.** DOA-aided relaying; interference nulling; multi-packet reception research;
+**Phase 5 — Carrier-phase coherence.** Build the reference-injection phase-calibration network; run the
+Laakso-style phase-alignment procedure; demonstrate short-baseline bearing, validated by the Heltec modem
+as a known-position beacon.
+
+**Phase 6 — Applications.** DOA-aided relaying; interference nulling; multi-packet reception research;
 sparse-array geometry studies.
 
-**Phase 6 — Out of scope, documented as future research.** Distributed and transmit-side coherent arrays
-(needs phase-coherent *transmit* silicon and cross-node synchronisation the current hardware lacks).
+**Phase 7 — Out of scope, documented as future research.** Distributed and transmit-side coherent arrays.
 
 Exit criteria and milestones are in [`ROADMAP.md`](ROADMAP.md).
 
@@ -191,12 +194,16 @@ practice of verifying the age and provenance of sources before relying on them.
 
 ## 11. Open questions
 
-1. Is only one RTL-SDR dongle in play, or two? (Determines a single-channel-plus-reference rig versus a
-   two-element array.)
-2. Can the Web-888 clock-out be configured to 28.8 MHz, and is it independent of the 122.88 MHz ADC clock?
-3. Which RTL-SDR clock-injection method is preferred for the dongles in use?
-4. Is Phase 3's TDOA target inter-building (metres–hundreds of metres) or inter-site (kilometres)?
-5. Which MeshCore hardware is the spare modem, and can it be driven as a calibration beacon from Linux?
+**Resolved (2026-09-28):** one RTL-SDR dongle; one Web-888; one Heltec V4 MeshCore modem.
+
+Still open:
+1. Can the Web-888 clock-out be configured to 28.8 MHz, and is it independent of the 122.88 MHz ADC clock?
+2. Is a spare ESP32 board (ESP32-C6 / ESP32-S3) available for Wi-Fi/BLE survey work, and what is the exact
+   ESP32-S3 board model?
+3. Is the RF survey primarily **fixed** (a parked installation) or **roving** (carried/driven), or both?
+4. For a second receiver (needed for TDOA and for a bearing array), is inter-building or inter-site
+   spacing intended?
+5. Which 5 GHz Wi-Fi coverage, if any, is wanted — noting the current hardware cannot reach 5 GHz.
 
 ## 12. References
 
