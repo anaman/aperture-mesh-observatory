@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Captured data and artifacts (keep out of git; publish via releases if needed)
+data/
+captures/
+*.iq
+*.wav
+*.bin
+*.sigmf-data
+*.sigmf-meta
+
+# Local configuration and secrets — never commit
+*.local.json
+*.secret
+.env
+.env.*
+secrets/
+keys/
+
+# Build / DSP intermediates
+build/
+*.o
+*.so
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
