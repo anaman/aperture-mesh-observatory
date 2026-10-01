@@ -200,7 +200,7 @@ Still open:
 1. Can the Web-888 clock-out be configured to 28.8 MHz, and is it independent of the 122.88 MHz ADC clock?
 2. Is a spare ESP32 board (ESP32-C6 / ESP32-S3) available for Wi-Fi/BLE survey work, and what is the exact
    ESP32-S3 board model?
-3. Is the RF survey primarily **fixed** (a parked installation) or **roving** (carried/driven), or both?
+3. ~~Is the RF survey primarily fixed or roving, or both?~~ **Resolved 2026-10-01: roving (wardriving) is primary.**
 4. For a second receiver (needed for TDOA and for a bearing array), is inter-building or inter-site
    spacing intended?
 5. Which 5 GHz Wi-Fi coverage, if any, is wanted — noting the current hardware cannot reach 5 GHz.

@@ -33,14 +33,14 @@ and where energy appears without a decodable packet.
 
 ## Phase 2 — Community RF survey *(new, 2026-09-28)*
 
-**Goal:** a detailed, georeferenced map of the local RF environment — fixed and/or roving.
+**Goal:** a detailed, georeferenced map of the local RF environment, **roving (wardriving) first**.
 
 **Capabilities**
-- Sub-GHz spectrum occupancy sweeps (24–1766 MHz) from the RTL-SDR.
+- Roving rig: RTL-SDR sub-GHz spectrum occupancy sweeps (24–1766 MHz) with GNSS position per record.
 - LoRa mesh overlay: decoded identity versus measured RSSI versus advertised position.
 - Wi-Fi 2.4 GHz and Bluetooth LE observations from a spare ESP32 board (identifiers hashed).
-- HF/VHF occupancy from the Web-888.
-- Position-tagged signal-strength heat-maps; long-duration occupancy history when fixed.
+- HF/VHF occupancy from the Web-888 (fixed reference/anchor).
+- Position-tagged signal-strength heat-maps; overlay of all layers on one map.
 
 **Exit criteria:** a georeferenced map, built from measured data, showing coverage, holes and hot spots,
 with personal identifiers hashed and not published.

@@ -1,8 +1,9 @@
 # Community RF Survey
 
-The **community RF survey** is the broad-coverage layer of the project: a data-collection system that
-scans the radio neighbourhood, georeferences what it hears, and builds a detailed map of the community's
-RF environment — sub-GHz spectrum, the LoRa mesh, Wi-Fi and Bluetooth LE.
+The **community RF survey** is the broad-coverage, **roving** layer of the project: a data-collection
+system carried or driven through the neighbourhood that scans the radio environment, georeferences what
+it hears, and builds a detailed map of the community's RF — sub-GHz spectrum, the LoRa mesh, Wi-Fi and
+Bluetooth LE.
 
 It complements the high-precision coherent core (bearing and TDOA). The survey answers *what is out
 there, and roughly where*; the coherent core answers *exactly where, and from which direction*.
@@ -18,17 +19,52 @@ Produce a detailed, georeferenced map of the local RF environment:
 - **Bluetooth LE** — BLE advertisements observed passively.
 - **Signal-strength heat-maps** to reveal coverage, holes and hot spots.
 
-## 2. Two modes
+## 2. Primary mode: roving (wardriving)
 
-The same instrument supports both; a survey can be run fixed, roving, or both.
+The survey is **mobile**: the rig is carried or driven through the neighbourhood with live GNSS, logging
+position-tagged measurements. This is the classic wardriving approach and what the project is built
+around.
 
-- **Fixed ("the wardrobe").** The rig parked at a vantage point (a home installation) running
-  continuously. Best for long-duration occupancy history, duty-cycle measurement, and detecting
-  intermittent or distant emitters.
-- **Roving.** The rig carried or driven through the neighbourhood with live GNSS, recording position-
-  tagged measurements. Best for coverage heat-maps and finding where signals exist at all.
+- Best for coverage heat-maps, finding where signals exist at all, and mapping the mesh's real footprint.
+- **Motion supplies the spatial diversity a single receiver cannot.** Many positions, each with a
+  measurement, combine into a map — which is exactly why one antenna is enough for the *coverage* map,
+  even though it is not enough for direction finding.
+- Passive throughout; nothing is transmitted except the compliant calibration beacon.
 
-> Both are passive. Nothing is transmitted except the compliant calibration beacon.
+An **optional fixed mode** (the rig parked at a vantage point) can be added later for long-duration
+occupancy history and intermittent-emitter detection. It is not required.
+
+### 2.1 The roving rig
+
+| Element | Roving role | Requirement |
+|---|---|---|
+| RTL-SDR | sub-GHz spectrum sweeps + LoRa band | USB, self-powered hub |
+| ESP32 board (spare) | 2.4 GHz Wi-Fi + BLE scanning | ESP32-C6 or ESP32-S3 |
+| Heltec V4 (MeshCore) | mesh identity / ground truth | serial to host |
+| GNSS | position + time on every record | mobile GNSS (puck, phone, or module) |
+| Host | capture, logging, live map | laptop or SBC |
+| Power + mounting | run while moving | battery pack, mount |
+
+Practical notes:
+- The host must be battery-capable and preferably arm's-length (a laptop is easiest to start; an SBC in a
+  bag is tidier).
+- Timestamps must be consistent across sensors; use the host clock disciplined by GNSS, or read GNSS time
+  per record.
+- Mount the antennas clear of the body and the vehicle shell — a poor antenna position silently biases
+  every measurement.
+
+### 2.2 Roving procedure
+
+1. Fix on GNSS before starting; confirm time and position are sound.
+2. Start the logger (sub-GHz sweep, mesh decode, Wi-Fi/BLE scan) with a single shared timestamp source.
+3. Drive or walk the area; vary the route so coverage is not dominated by one corridor.
+4. Stop; export; rebuild the map. Repeat runs over time to see change.
+
+### 2.3 Tooling
+
+- Wi-Fi/BLE: **Kismet** with a suitable radio, or an ESP32 scanning firmware; `gpsd` supplies position.
+- Sub-GHz: `rtl_power`-style sweeps; `rtl_433` for 433/868/915 MHz consumer devices.
+- Data format: WiGLE-style logging is an established, exchangeable format for wardriving runs.
 
 ## 3. Sensing layers and which hardware supplies each
 

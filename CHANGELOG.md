@@ -6,6 +6,11 @@ deliverables per phase.
 
 ## [Unreleased]
 
+### Changed — 2026-10-01 (roving confirmed)
+- `docs/RF_SURVEY.md`: roving (wardriving) is the primary mode; added roving rig, procedure and tooling.
+- `docs/ROADMAP.md`: Phase 2 restated as "roving (wardriving) first".
+- `README.md`, `docs/PROPOSAL.md`: updated to match.
+
 ### Added — 2026-09-28 (Phase 0)
 - Initial repository: `README.md`.
 - `docs/PROPOSAL.md` — full project proposal.

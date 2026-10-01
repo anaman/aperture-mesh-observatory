@@ -5,6 +5,25 @@ done, what was measured, what failed, what is next.
 
 ---
 
+## 2026-10-01 — Roving (wardriving) confirmed as the primary survey mode
+
+**Confirmed**
+- The community RF survey is **mobile**: wardriving, not a parked installation. (Charles clarified
+  "wardrobe" was a mis-transcription of "wardriving".)
+
+**Changed**
+- [`RF_SURVEY.md`](docs/RF_SURVEY.md): roving is now the primary mode; added the roving rig (hardware it
+  carries), a roving procedure, and the tooling list. Fixed mode demoted to an optional later addition.
+- [`ROADMAP.md`](docs/ROADMAP.md) Phase 2 restated as "roving (wardriving) first"; exit criteria note the
+  roving rig and a mobile GNSS dependency.
+- `README.md` and `PROPOSAL.md` updated to match.
+
+**Note**
+- Motion is what makes a single-receiver coverage map work: it supplies the spatial diversity one antenna
+  cannot. Direction finding still needs ≥2 coherent receivers — unchanged.
+
+---
+
 ## 2026-09-28 — Bench confirmed; community RF survey added
 
 **Confirmed**

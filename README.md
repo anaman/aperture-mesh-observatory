@@ -89,7 +89,7 @@ Full detail in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 |---|---|---|
 | **0** | Proposal, corpus, repo scaffolding | *done 2026-09-28* |
 | **1** | LoRa observatory core: RTL-SDR + Heltec modem, ground truth, duty-cycle analytics | no hardware mods |
-| **2** | **Community RF survey**: georeferenced sub-GHz + Wi-Fi/BLE mapping, fixed and roving | spare ESP32 board |
+| **2** | **Community RF survey**: roving wardriving — georeferenced sub-GHz + Wi-Fi/BLE mapping | spare ESP32 board + mobile GNSS |
 | **3** | LoRa PHY demodulation + multi-protocol decode (Meshtastic / MeshCore / Reticulum) | gr-lora_sdr |
 | **4** | Time/frequency coherence → absolute-time long-baseline TDOA | Web-888 clock distribution + a second receiver |
 | **5** | Carrier-phase coherence → short-baseline bearing; cooperative calibration beacon | reference-injection mod + a second receiver |
