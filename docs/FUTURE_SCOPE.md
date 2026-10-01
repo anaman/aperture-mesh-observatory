@@ -125,7 +125,10 @@ or a multi-node estimate.
 
 ## 6. Guardrails (non-negotiable)
 
-- Passive by default. Transmit only as an authorized participant, within power and duty-cycle limits.
+- **Listen-first, licence-gated transmit.** The full sensing capability works without any licence because
+  it is passive. Transmit is per-band and locked behind an explicit licence declaration; the operator
+  bears responsibility for every transmission.
+- Transmit only as an authorized participant, within power and duty-cycle limits.
 - Only devices we own or are explicitly authorized to control.
 - No jamming, no deauthentication, no interference generation.
 - No payload capture beyond what we are entitled to receive.

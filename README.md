@@ -100,12 +100,14 @@ Full detail in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Non-goals and safety
 
+- **Listen-first, licence-gated transmit.** An operator with no radio licence can use the full sensing
+  capability (all passive). Transmitting is per-band and locked behind an explicit licence declaration;
+  the operator bears responsibility for every transmission. See [`docs/REGULATORY.md`](docs/REGULATORY.md).
 - **No transmit beamforming on the RTL-SDRs** — they are receive-only; this is physics, not policy.
 - **No jamming, interference, or denial-of-service work**, ever. The wireless interference features are
   *passive detection and reporting* only.
 - **Regulatory compliance is mandatory.** Sensing is passive and generally unrestricted; any transmit
-  (including the calibration beacon) stays within ISM/EIRP/duty-cycle limits. See
-  [`docs/REGULATORY.md`](docs/REGULATORY.md).
+  (including the calibration beacon) stays within ISM/EIRP/duty-cycle limits.
 
 ## Reproducing this project
 

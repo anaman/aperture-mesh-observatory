@@ -137,4 +137,6 @@ Recorded, with their constraints, so the project's boundaries are explicit — n
 - **Log every experiment** in [`DEVLOG.md`](../DEVLOG.md) with date, hypothesis, method, result.
 - **Verify sources** for age and provenance before relying on them.
 - **Hash personal identifiers** and never publish household-identifying data.
+- **Keep transmit licence-gated**: receive-only by default; ISM transmission within limits; licence-requiring
+  bands locked until the operator declares a licence and callsign.
 - **Stay compliant** with spectrum and privacy rules (see [`REGULATORY.md`](REGULATORY.md)).

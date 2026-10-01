@@ -6,6 +6,11 @@ deliverables per phase.
 
 ## [Unreleased]
 
+### Changed — 2026-10-01 (listen-first principle)
+- `docs/REGULATORY.md` rewritten: listen-first, licence-gated transmit; per-band transmit gate table;
+  implementation of the gate.
+- Guardrails added to `docs/FUTURE_SCOPE.md` and `docs/ROADMAP.md`; `README.md` safety section updated.
+
 ### Added — 2026-10-01 (future scope)
 - `docs/FUTURE_SCOPE.md` — Winlink/B2F integration, distributed (owned) node grid, multi-protocol decode,
   the "respond" rules, and direction visualisation.

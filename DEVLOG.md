@@ -5,6 +5,27 @@ done, what was measured, what failed, what is next.
 
 ---
 
+## 2026-10-01 — Project principle set: listen-first, licence-gated transmit
+
+**Decided (Charles)**
+- The project must remain fully usable by an operator **without a ham licence** — they may **listen**
+  (passive sensing works for everyone) but must **not transmit** on any licence-requiring frequency until
+  they hold the licence. The operator bears responsibility for every transmission.
+
+**Documented**
+- [`REGULATORY.md`](docs/REGULATORY.md) rewritten: a listen-first principle, a **per-band transmit gate**
+  table, and the implementation (a single declaration holding `transmit_enabled`, licence type and
+  callsign; receive-only until declared; band-aware transmit paths).
+- Guardrails added to [`FUTURE_SCOPE.md`](docs/FUTURE_SCOPE.md) and [`ROADMAP.md`](docs/ROADMAP.md); `README.md`
+  safety section updated.
+
+**Design note**
+- Transmit is gated **per band**, not globally: ISM bands run within power/duty limits without a licence;
+  amateur bands stay locked until a callsign is declared. The gate is a configuration declaration, not a
+  hidden switch — it is logged and visible.
+
+---
+
 ## 2026-10-01 — Future scope recorded: Winlink/B2F and a distributed node grid
 
 **Requested by Charles (future work)**
