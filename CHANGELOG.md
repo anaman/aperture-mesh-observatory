@@ -6,6 +6,11 @@ deliverables per phase.
 
 ## [Unreleased]
 
+### Added — 2026-10-01 (future scope)
+- `docs/FUTURE_SCOPE.md` — Winlink/B2F integration, distributed (owned) node grid, multi-protocol decode,
+  the "respond" rules, and direction visualisation.
+- `docs/ROADMAP.md` Phase 7 expanded to include the Winlink integration and the node grid.
+
 ### Changed — 2026-10-01 (roving confirmed)
 - `docs/RF_SURVEY.md`: roving (wardriving) is the primary mode; added roving rig, procedure and tooling.
 - `docs/ROADMAP.md`: Phase 2 restated as "roving (wardriving) first".

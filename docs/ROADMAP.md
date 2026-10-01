@@ -115,13 +115,19 @@ and a stated accuracy.
 
 ---
 
-## Phase 7 — Documented future research (out of current scope)
+## Phase 7 — Documented future research and integrations (out of current scope)
 
+- **Winlink / B2F integration** — off-grid situational reporting via an existing B2F client (e.g. PAT). Needs
+  a transmit radio and an amateur licence; ham rules apply (no business content, no encryption).
+- **Distributed sensor / transmitter grid** — our own ESP32/LoRa nodes reporting RSSI and time to the core;
+  LoRa-capable nodes may also transmit as authorized participants. Never third-party devices.
+- **Direction visualisation** — coherent bearing (Phase 5) or multi-node RSSI localisation.
 - Distributed coherent arrays across nodes ("cell-free" style) — needs cross-node sub-symbol time and
   carrier-phase synchronisation.
 - Transmit-side coherent arrays — needs phase-coherent transmit silicon the current hardware lacks.
 
-Recorded so the project's boundaries are explicit, not to promise them.
+Recorded, with their constraints, so the project's boundaries are explicit — not to promise them. See
+[`FUTURE_SCOPE.md`](FUTURE_SCOPE.md).
 
 ---
 

@@ -5,6 +5,36 @@ done, what was measured, what failed, what is next.
 
 ---
 
+## 2026-10-01 — Future scope recorded: Winlink/B2F and a distributed node grid
+
+**Requested by Charles (future work)**
+- Integrate the platform with **Winlink B2F**.
+- Use **detected ESP32 devices** as listening/transmitting tools: pick up and decode the three main LoRa
+  data (MeshCore, Meshtastic, Reticulum) and, if the operator wishes, respond — with a visual of the
+  direction the message came from.
+
+**Researched**
+- Read the *Open B2F* spec in the browser (the site blocks automated fetches). B2F = message structure +
+  forwarding between Winlink RMS gateways and client programs; transports are Pactor/WINMOR/ARDOP/VARA/
+  Robust Packet/AX.25/Telnet; messages compress as FBB B1; header Type includes **Position Report**;
+  FCC §97.309 permits listening.
+
+**Recorded (new document: [`docs/FUTURE_SCOPE.md`](docs/FUTURE_SCOPE.md))**
+- Winlink integration = a **bridge** through an existing B2F client (PAT), not a reimplementation. LoRa is
+  *not* a Winlink transport. **Hardware gap:** Winlink RF needs a transmit radio the bench lacks.
+  **Legal:** Winlink RF is amateur radio — licence required, no business content, no encryption.
+- Distributed grid is scoped to **our own / explicitly authorized** devices only; commandeering
+  third-party devices is excluded (unauthorized access and transmission).
+- Decode is passive and permitted; payloads only where we hold the key. "Respond" = transmit, allowed
+  only as an authorized participant, to traffic addressed to us.
+- **Direction visual** needs ≥2 coherent receivers (Phase 5) or a multi-node RSSI grid; one receiver
+  cannot give a bearing.
+
+**Next**
+- Phase 1 bring-up unchanged; these remain future phases.
+
+---
+
 ## 2026-10-01 — Roving (wardriving) confirmed as the primary survey mode
 
 **Confirmed**

@@ -119,6 +119,7 @@ start at [`docs/REPLICATION.md`](docs/REPLICATION.md).
 - [`docs/HARDWARE.md`](docs/HARDWARE.md) — inventory, clock distribution, calibration hardware
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — phases, milestones, exit criteria
 - [`docs/RF_SURVEY.md`](docs/RF_SURVEY.md) — the georeferenced community RF survey subsystem
+- [`docs/FUTURE_SCOPE.md`](docs/FUTURE_SCOPE.md) — Winlink/B2F integration, distributed node grid, direction visualisation
 - [`docs/REPLICATION.md`](docs/REPLICATION.md) — how to rebuild from scratch
 - [`docs/REGULATORY.md`](docs/REGULATORY.md) — spectrum, power, duty-cycle and privacy notes
 - [`docs/GLOSSARY.md`](docs/GLOSSARY.md) — terms used throughout
